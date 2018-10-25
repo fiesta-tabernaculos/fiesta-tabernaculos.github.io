@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<!-- This HTML code looks nice because is manually written and then gnumaked -->
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- The above 4 meta tags *must* come first in the head -->
+
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<link rel="icon" href="images/bj-logo-ico.png">
+
+	<title>Ben-Jose Trainable SAT Solver Software Library</title>
+
+	<link href="css/bootstrap.css" rel="stylesheet">
+	<link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+	<link href="css/starter-template.css" rel="stylesheet">
+	<script src="js/ie-emulation-modes-warning.js"></script>
+</head>
+
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" 
+				data-toggle="collapse" data-target="#navbar" 
+				aria-expanded="false" aria-controls="navbar">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="index.html">
+				<img src="images/bj-mix-mini.png" alt="">
+			</a>
+		</div>
+		<div id="navbar" class="collapse navbar-collapse">
+			<ul class="nav navbar-nav">
+			<li class="active"><a href="index.html">Home</a></li>
+			<li><a href="#about">About</a></li>
+			<li><a href="#contact">Contact</a></li>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" 
+						role="button" aria-haspopup="true" aria-expanded="false">
+					Dropdown <span class="caret"></span>
+				</a>
+				<ul class="dropdown-menu">
+				<li><a href="#">Action</a></li>
+				<li><a href="#">Another action</a></li>
+				<li><a href="#">Something else here</a></li>
+				<li role="separator" class="divider"></li>
+				<li class="dropdown-header">Nav header</li>
+				<li><a href="#">Separated link</a></li>
+				<li><a href="#">One more separated link</a></li>
+				</ul>
+			</li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+					<li>
+						<a href="https://github.com/joseluisquiroga/ben-jose">
+							GitHub
+						</a>
+					</li>
+			</ul>
+		</div><!--/.nav-collapse -->
+	</div>
+</nav>
+
+<div class="container">
+
+<!-- START_OF index.txt -->
+
+<h1>Introduction</h1>
+
+<p>
+Ben-Jose is:
+
+<ol>
+<li>
+A sotware library.
+<li>
+A SAT problem solver.
+<li>
+Free Open Source software.
+<li>
+Trainable.
+<li>
+Research work.
+</ol>
+
+<p>
+Ben-jose is designed to be used as a support library for applications or libraries that need to solve both theoretical and practical instances of SAT. The expected user is a C/C++ programmer. 
+
+<p>
+The initial motivation for this software was to do better than existant solvers for
+Pigeon Hole Principle (PHP) instances of the SAT problem, and still be competitive for other instances.
+
+<h1>Download and Install</h1>
+
+<ol>
+	<li>
+	Download from 
+	<a href="https://github.com/joseluisquiroga/ben-jose">
+		https://github.com/joseluisquiroga/ben-jose
+	</a>
+
+	<li>
+	<code>
+		cd ben-jose/build/gnu_make
+	</code>
+
+	<li>
+	<code>
+		make -s
+	</code>
+</ol>
+
+Output will be in <code>ben-jose/build/gnu_make/lib/ben-jose</code>.
+
+<h2>Required Software</h2>
+<ol>
+	<li>A Linux system.
+	<li>GNU C++ (g++). It usually comes preinstalled.
+	<li>GMP Library (gmpxx). It usually comes preinstalled.
+	<li>GNU Make (Make). It usually comes preinstalled.
+</ol>
+
+<h1>Hello World example</h1>
+
+The basic functionality of the library is best shown by the bj-hello-world.c program:
+
+<pre>
+#include <stdio.h>
+#include "ben_jose.h"
+
+int main(int argc, char** argv)
+{
+	if(argc < 2){
+		printf("args: <cnf_file_path>\n");
+		return 1;
+	}
+	char* ff = argv[1];
+	
+	bj_solver_t ss = bj_solver_create("");
+	
+	bj_satisf_val_t  vv = bj_solve_file(ss, ff);
+	switch(vv){
+		case bjr_yes_satisf:
+			printf("%s is SAT instance\n", ff);
+			break;
+		case bjr_no_satisf:
+			printf("%s is UNS instance\n", ff);
+			break;
+		case bjr_error:
+			printf("ERROR ! in %s\n", ff);
+			break;
+		default:
+			printf("FATAL ERROR ! in %s\n", ff);
+			break;
+	}
+	
+	// more info with this functions
+	//bj_output_t oo = bj_get_output(ss);
+	//const long* aa = bj_get_assig(ss);
+	
+	bj_solver_release(ss);
+	return 0;
+}
+</pre>
+
+<p>
+This program finds the solution to the SAT instance defined by the file ''ff''. The file must be in the simplified DIMACS format as described in \url{http://www.satcompetition.org/2009/format-benchmarks2009.html}.
+
+<p>
+Three functions are minimally needed to use the library \bjsolvercreate, \bjsolvefile, and \bjsolverrelease.
+
+<h2>Compiling Hello World</h2>
+
+<p>
+Once the library has been installed (see Section \ref{sect:installation}), a user program can be compiled using standard c++ compilation.
+
+<p>
+Assuming that the file libben-jose.a is in the directory {\BJLIBPTH}, the program in Listing \ref{hello-prog} is build and compiled as in Listing \ref{compiling-hello-prog}:
+
+<pre>
+BJ_LIB_PTH=../../../build/gnu_make/bin
+
+cc -o bj-hello-world.o -c -MD -Wall -std=c99 -I../../library/api bj-hello-world.c
+cc -o bj-hello-world -rdynamic -L${BJ_LIB_PTH} bj-hello-world.o -lben-jose -lstdc++ -lgmpxx -lgmp
+</pre>
+
+
+<h3>Input format</h3>
+
+<p>
+The input format of a file called with \bjsolvefile must be the simplified DIMACS format.
+
+<p>
+The simplified DIMACS format is just that:
+
+<pre>
+c
+c start with comments
+c
+c 
+p cnf 5 3
+1 -5 4 0
+-1 5 3 4 0
+-3 -4 0
+</pre>
+
+<ul>
+<li>
+The file can start with comments, that is lines begining with the character c.
+
+<li>
+Right after the comments, there is the line p cnf nbvar nbclauses indicating that the instance is in CNF format; nbvar is the exact number of variables appearing in the file; nbclauses is the exact number of clauses contained in the file.
+
+<li>
+Then the clauses follow. Each clause is a sequence of distinct non-null numbers between -nbvar and nbvar ending with 0 on the same line; it cannot contain the opposite literals i and -i simultaneously. Positive numbers denote the corresponding variables. Negative numbers denote the negations of the corresponding variables.
+</ul>
+
+
+
+<h2>Architecture</h2>
+
+<p>
+The architecture of the ben-jose library is strongly monolitic in the sense that the basic functionality of the whole library is basically one function with three presentations: {\bjsolvefile}, {\bjsolvedata} and {\bjsolveliterals}.
+
+<p>
+That means that every piece of code within the ''library'' directory of the source tree is tightly coupled.
+
+<p>
+Having said that the following description of the library will give a good idea of it's architecture.
+
+<h3>The Library</h3>
+
+<p>
+The following classes and names for attributes are the most important to explain how the solver works. They are explained in terms used in ~\cite{silva-95}, ~\cite{moskewicz-01} and  ~\cite{bastert-02}.
+
+<h3>DPLL+BCP+CDCL classes</h3>
+
+<p>
+To explain the most important parts of  DPLL+BCP+CDCL, the following classes will be used.
+
+<p>
+{\neuron}. class for CNF clause behavior. So there is one {\neuron} per clause.
+
+<p>
+{\quanton}: class for CNF variables (each variable has a positon and a negaton). There are two {\quanton}s per variable. {\neuron}s hold references to {\quanton}s called fibres. They are used for BCP.
+
+<p>
+{\propsignal}: class for representing BCP propagation data: which {\quanton} fired by which {\neuron} (which clause forced a given variable). BCP is done with the two watched literals technique (two watched fibres in the library's terminology).
+
+<p>
+{\deduction}: class for holds the result of analyzing (doing resolution) of a conflict. It has the data for learning new {\neuron}s (clauses).
+
+<p>
+{\brain}: class that holds all data used to solve a particular CNF instance. So there is one {\brain} per CNF instance. It is created to solve an instance, and destroyed after solving that particular instance.
+
+<p>
+{\deducer}: class that holds the data used to analyze a conflict.
+
+<p>
+{\leveldat}: A level is all that happens between choices during BCP. So there is one level per choice. This class holds level relevant data.
+
+<h3>Stabilization classes</h3>
+
+<p>
+The process of calculating a BDUST canonical form formula (BCFF) is called stabilization. The following classes will be used to explain the most important aspects of CNF stabilization:
+
+<p>
+{\sortglb}: It holds all global data used to stabilize a group of items ({\neuron}s and {\quanton}s representing a sub-formula of a CNF). It does not handle {\neuron}s and {\quanton}s, instead it handles {\sortee}s.
+
+<p>
+{\sortee}: It is an item to be stabilized. Each {\neuron}s contains one {\sortee} and each {\quanton}s contains one {\sortee}. Each {\sortee} ''knows'' (void pointer) which {\neuron} or {\quanton} contains it. It is a one-to-one relation that is used to stabilize CNF sub-formulas. During stabilization, the {\sortglb} handles the {\sortee}s not the {\neuron}s and {\quanton}s containing them.
+
+<p>
+{\sorset}: It is a group of {\sortee}s. In  order to stabilize a group of {\sortee}s the {\sortglb} class (or sortor) groups {\sortee}s (representing {\neuron}s and {\quanton}s in our case) into {\sorset}s. A sub-formula is represented within stabilization by a group of {\sorset}s. Each step of stabilization refines the group of {\sorset}s that represent the stabilizing sub-formula, so that every step there are more {\sorset}s, each one having less {\sortee}s, until the process cannot refine each {\sorset} anymore. The ideal stabilization ends with each {\sorset} containing only one {\sortee}. Since stabilization handles only {\sortee}s. This class is used for such iterated sub-grouping.
+
+<p>
+{\sortrel}: It represents a relation between two {\sortee}s. In our case every {\sortee} representing a {\neuron} holds one {\sortrel} per fiber (literal), and each {\sortee} representing a {\quanton} holds one {\sortrel} per {\neuron} in wick the {\quanton} is found. They must be properly initiated before each stabilization. They define the stabilizing sub-formula's relations between it's {\neuron}s and {\quanton}s by relating their respective {\sortee}s. They represent relations between a particular sub group (sub-formula) of {\neuron}'s {\sortee}s and {\quanton}'s {\sortee}s.
+
+<h4>Matching classes</h4>
+
+<p>
+Matching consists basically of two steps. Stabilization and finding the resulting BCFF in the database of BCFFs. The following classes will be used to explain the most important aspects of CNF matching:
+
+<p>
+{\coloring}: The initial and final state for an stabilization is a {\coloring}. A color is just an integer. A {\coloring} of a sub-formula is an assignation of an integer ({\neuron}-color) to each {\neuron} and an integer ({\quanton}-color) to each {\quanton} of the sub-formula. An stabilization may start with all {\neuron}s having the same {\neuron}-color and all {\quanton}s having the same {\quanton}-color and finalize with each {\neuron} having a unique {\neuron}-color and each {\quanton} having a unique {\quanton}-color, called a complete {\coloring}. 
+
+<p>
+{\coloring}s are ''loaded'' into the {\sortglb} class in order to start stabilization. After stabilization the final {\coloring} may be ''saved''. Each color in a coloring will correspond to one {\sorset} during stabilization.
+
+<p>
+This class is used to specify only the input to the stabilization process (the initial state). The class {\canoncnf} is used for the output (it is the result of applying the output {\coloring} (stabilized {\coloring}) to the sub-formula it defines: {\neuron}s and {\quanton}s in the {\coloring}. To initialize the sortor, it ''loads'' the initial {\coloring} into the {\sortglb} instance that will stabilize the CNF sub-formula.
+
+<p>
+{\canoncnf}: It is a BCFF. It represents the output of an stabilization process: the stabilized CNF sub-formula. It is the interface class to the database class that handles all disk operations (the {\skeleton} class). This class contains some disk handling related information (paths and sha info). A {\canoncnf} basically is a set of {\canonclause}s (which are basically arrays of numbers).
+
+<p>
+{\neuromap}: This class represents a CNF sub-formula. It is the pivot class to do all stabilization. It is maintained during BCP and used during backtracking in order to know what CNF sub-formulas are to be stabilized and searched for in the database ({\skeleton} class). There is one {\neuromap} per {\leveldat} and they are either active or inactive. Active when they are candidates for stabilization, matching and search in database (or saving), at backtrack time. When a CNF  sub-formula, during search, is found to be unsatisfiable, is not trivial (BCP could not figure it out), and both search branches had the same variables (so that it can latter be searched only with one of them), it is saved, stored in the database ({\skeleton} class). Every time an still active {\neuromap} has done its first branch of BCP, it is stabilized and searched for in the database ({\skeleton} class). Trivial sub-formulas are called anchors in the code because they serve as a start point for stabilizing not trivial ones. 
+
+<h4>Database classes</h4>
+
+<p>
+The {\skeleton} class handles all disk related functions and management. The database is basically a directory and all its sub-directories in disk. The directory ({\skeleton}) is seen as a group of (''key'',''value'') pairs. Just like a common database ''index'', a ''dictionary'' class, or a ''map'' class. A path within the {\skeleton} is a ''key'' and the files in the path are the ''value''. To see if a ''key'' exists is to see if a path exists within the {\skeleton}. Unsatisfiable {\canoncnf}s are saved and searched by the SHA function of their content. They are saved in a path (''key'') that is constructed with the SHA and other relevant search info. 
+
+<p>
+Since an unsatisfiable sub-formula might not be minimal (have some unnecessary clauses for unsatisfiability), each unsatisfiable CNF sub-formula has three relevant {\canoncnf}: 
+
+<ul>
+<li>
+The guide. It is the {\canoncnf} resulting of stabilizing the CNF sub-formula covered by first search branch variables. So it is a satisfiable part of the unsatisfiable CNF sub-formula that is a ''guide'' for the search.
+
+<li>
+The tauto. It is the full unsatisfiable CNF sub-formula. It is the {\canoncnf} resulting of stabilizing the CNF sub-formula covered by both search branches charged {\quanton}s (used variables). 
+
+<li>
+The diff. This {\canoncnf} contains all {\canonclause}s in tauto but not in guide. Each diff is saved in a path called 'variant' in the {\skeleton}. So one guide can have several variants. 
+</ul>
+
+<p>
+A search of a target CNF sub-formula is conducted in two phases: the search for the guide of the target and the search for the variant that is a sub-formula of the target diff. Once the guide is stabilized the search for it is a simple: ''see if its path exists'' (remember that its path contains the SHA of its content). If the target {\canoncnf} is not equal to a variant (the path does not exist), the second phase is more time consuming because it involves reading each variant and comparing it to the target diff to see if the the variant is a sub-formula of the target diff (which would mean that the target is unsatisfiable and therefore can be backtracked).
+
+<h4>The solve_instance function</h4>
+
+<p>
+To help in the understanding of the functioning of the ben-jose library and to get 
+familiarized with the backbone functions of the library look at the file:
+
+<pre>
+	ben-jose/src/library/api/macro_ben_jose.cpp
+</pre>
+
+<h3>Goodies</h3>
+
+<p>
+The library comes with some tools.
+
+<h4>Proofs</h4>
+
+<p>
+ben-jose can generate proofs for unsatisfiable formulas. 
+
+<p>
+Assuming the program ''bj-batch-solver'' is in the path, and from the source tree directory:
+
+<pre>
+	cd ben-jose/src/programs/tests/solver
+</pre>
+
+<p>
+with the command:
+
+<pre>
+	bj-batch-solver ./h4.cnf -proof -rr
+</pre>
+
+<p>
+the bj-batch-solver program will use the bjp\_write\_proofs library option to generate the proof of the unsatisfiable instance ''h4.cnf'' in JSON format. 
+
+<p>
+The proof can be read using the HTML page:
+
+<pre>
+	./SKELETON/CNF/Show_Proof.htm
+</pre>
+
+<p>
+and copying the (very long) path printed in the standard output under ''LAST\_PROOF\_PATH='' to the text area field in the Show\_Proof.htm HTML page in your favorite firefox navigator, and then clicking ''LOAD\_FILE''. Paths must begin with ''/SKELETON'', so after copying, get  rid of the prefix before it, before clicking ''LOAD\_FILE''.
+
+<h4>PHP visualizing</h4>
+
+<p>
+A bj-phi program that generates HTML pages with cytoscape.js (\url{http://js.cytoscape.org/}) graphs to visualize the solving of PHP instances (see Section \ref{sect:use-case}).
+
+<h4>Debugging</h4>
+
+<p>
+ben-jose has a configurable built-in debugging system (debug directory) to help in the debugging of the library. The bj-solver-debug program is compiled with the libdbg-ben-jose.a library for that purpose.
+
+
+<h2>Use case</h2>
+
+<p>
+The target case when development of ben-jose started was PHP instances. It is a well studied theoretical case that shows exponential behavior for RES.
+
+<p>
+ben-jose comes with a program that helped in the development of ben-jose called bj-phi.
+
+<h3>bj-phi</h3>
+
+<p>
+Assuming the program ''bj-phi'' is in the path, and from the source tree directory:
+
+<pre>
+	cd ben-jose/src/programs/tests/phi
+</pre>
+
+<p>
+with the command:
+
+<pre>
+	bj-phi 4
+</pre>
+
+<p>
+will execute the bj-phi program for PHP-4 and it will use the file 
+
+<pre>
+	./dbg_ben_jose.conf
+</pre>
+
+<p>
+to configure the debugging system to generate an HTML log file of the the solving process for PHP-4. It will be written in:
+
+<pre>
+	./phi_hole_4/phi_hole_4_all_steps.htm
+</pre>
+
+<p>
+It is very important to observe that the contents of \textbf{the file is different for the second time you run the bj-phi program} because the second time the ben-jose finds BCFFs that were written in the first run. The second time ben-jose will find the sub-formulas PHP-2, PHP-3, and itself PHP-4 to determine unsatisfiability in the first backtrack. This behavior can be observed in this HTML log file.
+
+<p>
+In order to restart the original state before the first run: that is to delete the {\skeleton} and the generated files by bj-phi simply run:
+
+<pre>
+	sh ./clean_sh
+</pre>
+
+<p>
+The HTML log file, when opened with your favorite firefox navigator, should show you a web page with graphs of the following style:
+
+
+<p>
+\begin{figure}[H]
+	\begin{centering}
+		\frame{\includegraphics[width=0.7\textwidth]{h2_base.png}}
+		\caption{bj-phi representation of a PHP instance of size 2}
+		\label{fig:h2-graph}
+	\end{centering}
+\end{figure}
+
+
+<p>
+The image represents the DIMACS-CNF file:
+
+<pre>
+p cnf 6 9
+-1 -2 0
+-1 -3 0
+-2 -3 0
+
+-4 -5 0
+-4 -6 0
+-5 -6 0
+
+1 4 0
+2 5 0
+3 6 0
+</pre>
+
+<p>
+Where dashed lines represent negative literals and solid lines represent positive literals. Circles represent variables and little rectangles represent clauses.
+
+<p>
+In Figure \ref{fig:h2-graph} the thick little rectangle joining two thick solid lines  represent the clause [2 5 0] of line 11 in Listing \ref{h2-file}.
+
+<p>
+The graphs shown in the HTML page have more implicit information:
+
+<p>
+\begin{figure}[H]
+	\begin{centering}
+		\frame{\includegraphics[width=0.9\textwidth]{h4_find1.png}}
+		\caption{bj-phi graph for the first time PHP-2 is matched within PHP-4 solving}
+		\label{fig:h4-f1}
+	\end{centering}
+\end{figure}
+
+<p>
+The equivalent consecutive numbering of variables shown in Figure \ref{fig:h2-graph} is assumed in Figure \ref{fig:h4-f1} according to their position from left to right, therefore the numbering shown in Figure \ref{fig:h4-f1} is not that of the literal but the ''tier'' of the ''charged'' {\quanton}. In Figure \ref{fig:h4-f1} variable 17 was charged in tier 8, variable 12 has tier 9, variables 14 and 15 have tier 10, and variables 19 and 20 have tier 11.
+
+<p>
+The dashed and solid lines in Figure \ref{fig:h4-f1} do not represent the sign of literals as in Figure \ref{fig:h2-graph}. In Figure \ref{fig:h4-f1} the signs of literals are also assumed according to their position in the graph: all above the circles are negative and all below are positive. 
+
+<p>
+The dashed lines and solid lines in Figure \ref{fig:h4-f1} represent the current assignation of a variable: 
+
+<ul>
+<li>
+If the lines match the original state (were dashed and still dashed) the variable is positively charged.
+
+<li>
+If they do not match the original, the variable is negatively charged.
+</ul>
+
+<p>
+In Figure \ref{fig:h4-f1} variables 12, 19 and 20 are positive, and variables 14, 15 and 17 are negative.
+
+<p>
+The little triangle indicates a choice therefore in Figure \ref{fig:h4-f1} variable 17 is a choice.
+
+<h2>Installation</h2>
+
+<p>
+Since there is no current release version of the library, it has to be installed from source. To do so:
+
+<ul>
+<li>
+Download the library from \url{https://github.com/joseluisquiroga/ben-jose}.
+
+<li>
+Build and install the library following the instructions in the README.txt file.
+</ul>
+
+<p>
+The README.txt file refers you to the installation alternatives:
+
+<ul>
+<li>
+To build and install with autotools follow:
+
+<pre>
+	./build/gnu_autotools/README.to_install_with_autotools
+</pre>
+
+<li>
+To build with gnu\_make follow:
+
+<pre>
+	./build/gnu_make/README.to_install_with_gnu_make
+</pre>
+
+</ul>
+
+<p>
+It is very probable that when installing with autotools you will need to first follow the file:
+
+<pre>
+	./build/gnu_autotools/README.when_clean_all_non_human_made
+</pre>
+
+<p>
+because the source tree is usually cleaned from all non human made files.
+
+<h3>Required Packages</h3>
+
+<p>
+There are minimal requirements for building and compiling ben-jose:
+
+<ul>
+<li>
+A Linux system.
+
+<li>
+GNU c++ (g++) installed.
+
+<li>
+GMP Library (gmpxx) installed.
+</ul>
+
+<p>
+Almost every Linux system comes with the second two in the basic installation, so there is basically one requirement: a Linux system.
+
+<h2>Comparison with other tools</h2>
+
+<h3>Trainable</h3>
+
+<p>
+The most important difference of ben-jose with any other solver available today is the fact that it matches sub-formulas to already known to be unsatisfiable formulas (BCFFs) in order to skip the search on sub-formulas that match.
+
+<p>
+That technique allows this solver to be trainable. It holds a database of BCFFs that can be reused in later instances of SAT.
+
+<p>
+In order to archive this behavior some important modifications had to be done to the standard way of doing DPLL+BCP+CDCL. Learned clauses ({\neuron}s) are kept only until they are backtracked. That imposes a performance penalty when that clause can actually prune the search after it has been backtracked since it has to be deduced again by RES.
+
+<h3>Monos</h3>
+
+<p>
+They are variables ({\quanton}s) that occur either only in positive form, or only in negative form after a BCP step, that is a level has been processed ({\leveldat} hold the data for levels). In the code they are called ''monos''. So:
+
+<ul>
+<li>
+When it is detected that there are only positons of a variable in the current sub-formula, the variable can safely be assumed to be set ''true''. 
+
+<li>
+When it is detected that there are only negatons of a variable in the current sub-formula, the variable can safely be assumed to be set ''false''. 
+</ul>
+
+<p>
+This difference is crucial for to ease the matching of BCFFs.
+
+<h3>Longest BCP</h3>
+
+<p>
+The solver uses a kind of ''look up technique'' that always chooses the ''longest'' path for BCP. 
+
+<p>
+When ever a choice is been made it tries both values in order to see which value propagates more variables. 
+
+<p>
+This difference is also crucial for to ease the matching of BCFFs.
+
+<p>
+In the code it can bee seen in the function ''start\_propagation'' when it calls ''select\_propag\_side''.
+
+
+<h2>Future Work</h2>
+
+<p>
+Things to do with ben-jose:
+
+<ul>
+<li>
+Test, test and test. And when necessary debug, debug and debug.
+
+<li>
+Follow in detail for is-prime instances. It implies writing code to generate cytoscape.js graphs that help visualize the solving process.
+
+<li>
+<p>
+Write a concurrent version of ben-jose. Since a search branch can use the work done by an other search branch (use BCFFs written by the other branch) it is conceptually efficient to do concurrency.
+
+<p>
+The code has already considered this possibility by using the file system as a database and considering concurrency during file access.
+</li>
+
+</ul>
+
+
+<h2>Acknowledgments</h2>
+
+<ul>
+<li>
+Our heavenly Father YHWH (Yahweh).
+
+<li>
+Our Lord Yashua (Jesus Christ).
+
+<li>
+Magda Beltran de Quiroga (my mother).
+
+<li>
+Federman Quiroga Rios (my father).
+
+<li>
+Joao Marquez da Silva for his work on the SAT problem.
+
+<li>
+All the authors in the bibliography.
+
+</ul>
+
+
+
+<!-- START_OF bottom.txt -->
+
+</div><!-- /.container -->
+
+
+<!-- Bootstrap core JavaScript -->
+<script src="js/jquery.js"></script>
+<script>
+	window.jQuery || 
+	document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="js/bootstrap.js"></script>
+<script src="js/ie10-viewport-bug-workaround.js"></script>
+  
+
+<div id="link64_vdp_tabid" style="display:none;">1031</div>
+
+</body>
+</html>
+

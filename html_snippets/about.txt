@@ -1,0 +1,18 @@
+<!-- START_OF about.txt -->
+
+<h1>Edición</h1>
+
+<p>
+<a class="link external" href="http://toda-carne.github.io" target="blank">
+toda-carne.github.io</a>
+
+<p>
+<a class="link external" href="http://joseluisquiroga.github.io" target="blank">
+joseluisquiroga.github.io</a>
+
+<br>
+<br>
+<br>
+
+
+
